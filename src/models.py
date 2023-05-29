@@ -56,7 +56,7 @@ class Personas(db.Model):
     color_de_pelo = db.Column(db.String(20), nullable=False)
     peso = db.Column(db.Integer, nullable=False)
     altura = db.Column(db.Integer, nullable=False)
-    # personas = db.relationship('Favoritos_personas', backref='personas', lazy=True)
+    personas = db.relationship('Favoritos_personas', backref='personas', lazy=True)
 
      
     def __repr__(self):
@@ -73,6 +73,7 @@ class Personas(db.Model):
              "color_de_pelo":self.color_de_pelo,
              "peso":self.peso,
              "altura":self.altura,
+             "personas":self.personas.serialize(),
              # do not serialize the password, its a security breach
          }
 
@@ -90,7 +91,7 @@ class Planetas(db.Model):
     clima = db.Column(db.String(80), nullable=False)
     terreno = db.Column(db.String(100), nullable=False)
     superficie_liquida = db.Column(db.Integer, nullable=False)
-    # planetas = db.relationship('Favoritos_planetas', backref='planetas', lazy=True)
+    planetas = db.relationship('Favoritos_planetas', backref='planetas', lazy=True)
 
     def __repr__(self):
         return '<Planetas %r>' % self.id
@@ -106,7 +107,8 @@ class Planetas(db.Model):
              "poblacion":self.poblacion,
              "clima":self.clima,
              "terreno":self.terreno,
-             "superficie_liquida ":self.superficie_liquida ,
+             "superficie_liquida ":self.superficie_liquida,
+             "planetas":self.planetas.serialize(),
              # do not serialize the password, its a security breach
          }    
 
@@ -127,60 +129,85 @@ class Vehiculos(db.Model):
     velocidad_maxima = db.Column(db.Integer, nullable=False)
     capacidad_carga = db.Column(db.Integer, nullable=False)
     provisiones = db.Column(db.String(100), nullable=False)
-    # vehiculos = db.relationship('Favoritos_vehiculos', backref='vehiculos', lazy=True)
+    vehiculos = db.relationship('Favoritos_vehiculos', backref='vehiculos', lazy=True)
 
 
     def __repr__(self):
         return '<Vehiculos %r>' % self.id
 
     def serialize(self):
-            return {
-                "id": self.id,
-                "nombre": self.nombre,
-                "modelo": self.modelo,
-                "clase": self.clase,
-                "constructorl":self.constructor,
-                "coste":self.coste,
-                "longitud":self.longitud,
-                "tripulacion":self.tripulacion,
-                "pasajeros":self.pasajeros,
-                "velocidad_maxima":self.velocidad_maxima,
-                "capacidad_carga":self.capacidad_carga,
-                "provisiones":self.provisiones,
-                # do not serialize the password, its a security breach
-            }        
-    
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "modelo": self.modelo,
+            "clase": self.clase,
+            "constructorl":self.constructor,
+            "coste":self.coste,
+            "longitud":self.longitud,
+            "tripulacion":self.tripulacion,
+            "pasajeros":self.pasajeros,
+            "velocidad_maxima":self.velocidad_maxima,
+            "capacidad_carga":self.capacidad_carga,
+            "provisiones":self.provisiones,
+            "vehiculos":self.vehiculos.serialize(),
+            # do not serialize the password, its a security breach
+        }        
 
-# class Favoritos_personas(db.Model):
+
+class Favoritos_personas(db.Model):
 #     __tablename__ = 'favoritos_personas' 
 #     # Here we define columns for the table person
 #     # Notice that each column is also a normal Python instance attribute.
-#     id = db.Column(db.Integer, primary_key=True)
-#     usuario_id = db.Column(db.Integer, nullable=False)
-#     personas_id = db.Column(db.Integer, nullable=True)
-#     usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
-#     personas_id = db.Column(db.Integer, ForeignKey('personas.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    personas_id = db.Column(db.Integer, db.ForeignKey('personas.id'))
 
-# class Favoritos_planetas(db.Model):
+    def __repr__(self):
+        return '<Favoritos_personas %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "usuario_id": self.usuario_id,
+            "personas_id": self.personas_id,
+        }
+
+class Favoritos_planetas(db.Model):
 #     __tablename__ = 'favoritos_planetas' 
 #     # Here we define columns for the table person
 #     # Notice that each column is also a normal Python instance attribute.
-#     id = db.Column(db.Integer, primary_key=True)
-#     usuario_id = db.Column(db.Integer, nullable=False)
-#     planetas_id = db.Column(db.Integer, nullable=True)
-#     usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
-#     planetas_id = db.Column(db.Integer, ForeignKey('planetas.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    planetas_id = db.Column(db.Integer, db.ForeignKey('planetas.id'))
 
-#    class Favoritos_vehiculos(db.Model):
+    def __repr__(self):
+        return '<Favoritos_planetass %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "usuario_id": self.usuario_id,
+            "planetas_id": self.planetas_id,
+        }
+
+
+
+class Favoritos_vehiculos(db.Model):
 #     __tablename__ = 'favoritos_vehiculos' 
 #     # Here we define columns for the table person
 #     # Notice that each column is also a normal Python instance attribute.
-#    id = db.Column(db.Integer, primary_key=True)
-#    usuario_id = db.Column(db.Integer, nullable=False)
-#     vehiculos_id = db.Column(db.Integer, nullable=True)
-#     # 
-####    vehiculos_id = db.Column(db.Integer, ForeignKey('vehiculos.id'))
-#     usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    vehiculos_id = db.Column(db.Integer, db.ForeignKey('vehiculos.id'))
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
 
+    def __repr__(self):
+        return '<Favoritos_vehiculos %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "usuario_id": self.usuario_id,
+            "vehiculos_id": self.vehiculos_id,
+        }
 
    
