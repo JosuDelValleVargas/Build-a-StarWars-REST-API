@@ -126,63 +126,111 @@ def handle_usuario_favoritos():
 
     return jsonify(response_body), 200
 
-@app.route('/favorito/planeta/<int:planetas_id', methods=['POST'])
-def create_planeta_favorito(planetas_id):
+# EndPoint creacion de planeta favoritos para un usuario
+@app.route('/favorito/planeta/<int:planetas_id>/<int:usuario_id>', methods=['POST'])
+def create_planeta_favorito(planetas_id,usuario_id):
 
     planeta_favorito = Favoritos_planetas.query.filter_by(planetas_id=planetas_id).first()
+    usuario = Usuario.query.filter_by(id=usuario_id).first()
     response_body = {}
-   
-    if planeta_favorito == None: 
 
-        response_body["msg"] = "no existe planeta favorito"
+    if usuario is None:
+
+        response_body["msg"] = "El usuario no existe"
         return jsonify(response_body), 404
+   
+    if planeta_favorito: 
 
-    response_body = {
-         
-        "result": planeta_favorito.serialize(),
-        "msg":  "ok"
-    }
+        response_body["msg"] = "El planeta ya era favorito"
+        return jsonify(response_body), 208
+    
+
+
+    favorito_planeta = Favoritos_planetas(usuario_id=usuario_id, planetas_id=planetas_id)
+    db.session.add(favorito_planeta)
+    db.session.commit()
+    
+    response_body["msg"] = "El planeta ahora es favorito"
+
     return jsonify(response_body), 200 
 
+# EndPoint creacion de personas favoritos para un usuario, enviando el id del usuario por el body
+@app.route('/favorito/personas/<int:personas_id>', methods=['POST'])
+def create_persona_favorito(personas_id,):
+
     body = json.loads(request.data)
-    response_body={}
 
-    if body == None:
-        response_body["msg"] = "No has enviado información."
+    persona_favorito = Favoritos_personas.query.filter_by(personas_id=personas_id).first()
+    usuario = Usuario.query.filter_by(id=body["usuario_id"]).first()
+    response_body = {}
+
+    if usuario is None:
+
+        response_body["msg"] = "El usuario no existe"
         return jsonify(response_body), 404
-    
-    if not "email" in body:
-        response_body["msg"] = "La propiedad email no existe, por favor indiquela."
-        return jsonify(response_body), 404
-    
-    email = Usuario.query.filter_by(email=body["email"]).first()
    
-    if email != None: 
-         response_body["msg"] = "Existe un usuario con este email"
-         return jsonify(response_body), 404
+    if persona_favorito: 
+
+        response_body["msg"] = "La persona ya era favorito"
+        return jsonify(response_body), 208
     
-    if not "nombre" in body:
-        response_body["msg"] = "La propiedad nombre no existe, por favor indiquela."
-        return jsonify(response_body), 404
-    
-    if not "apellido" in body:
-        response_body["msg"] = "La propiedad apellido no existe, por favor indiquela."
-        return jsonify(response_body), 404
-    
-    if not "password" in body:
-        response_body["msg"] = "La propiedad password no existe, por favor indiquela."
-        return jsonify(response_body), 404
 
 
-    usuario = Usuario(nombre=body["nombre"], apellido=body["apellido"], email=body["email"], password=body["password"])
-    
-    response_body["msg"] = "Usuario creado"
-    
-    db.session.add(usuario)
+    favorito_persona = Favoritos_personas(usuario_id=body["usuario_id"], personas_id=personas_id)
+    db.session.add(favorito_persona)
     db.session.commit()
+    
+    response_body["msg"] = "La persona ahora es favorito"
 
+    return jsonify(response_body), 200 
+
+# EndPoint para borrado de planeta favoritos para un usuario 
+@app.route('/favorito/planeta/<int:planetas_id>/<int:usuario_id>', methods=['DELETE'])
+def borrar_planeta_favorito(planetas_id,usuario_id):
+
+    planeta_favorito = Favoritos_planetas.query.filter_by(planetas_id=planetas_id).first()
+    usuario = Usuario.query.filter_by(id=usuario_id).first()
+    response_body = {}
+
+    if usuario is None:
+
+        response_body["msg"] = "El usuario no existe"
+        return jsonify(response_body), 404
+   
+    if planeta_favorito is None:
+        response_body["msg"] = "El Planeta no existe"
+        return jsonify(response_body), 404
+
+ 
+    db.session.delete(planeta_favorito)
+    db.session.commit()
+    
+    response_body["msg"] = "El planeta fue borrado"
     return jsonify(response_body), 200
 
+# EndPoint para borrado de personas favoritos para un usuario 
+@app.route('/favorito/personas/<int:personas_id>/<int:usuario_id>', methods=['DELETE'])
+def borrar_persona_favorito(personas_id,usuario_id):
+
+    persona_favorito = Favoritos_personas.query.filter_by(personas_id=personas_id).first()
+    usuario = Usuario.query.filter_by(id=usuario_id).first()
+    response_body = {}
+
+    if usuario is None:
+
+        response_body["msg"] = "El usuario no existe"
+        return jsonify(response_body), 404
+   
+    if persona_favorito is None:
+        response_body["msg"] = "La persona no existe"
+        return jsonify(response_body), 404
+
+ 
+    db.session.delete(persona_favorito)
+    db.session.commit()
+    
+    response_body["msg"] = "La persona fue borrado"
+    return jsonify(response_body), 200
 
 
 
