@@ -28,7 +28,10 @@ class Usuario(db.Model):
     apellido = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
-    
+    personas = db.relationship('Favoritos_personas', backref='usuario', lazy=True)
+    planetas = db.relationship('Favoritos_planetas', backref='usuario', lazy=True)
+    vehiculos = db.relationship('Favoritos_vehiculos', backref='usuario', lazy=True)
+
     def __repr__(self):
          return '<Usuario %r>' % self.id
 
@@ -39,6 +42,10 @@ class Usuario(db.Model):
              "apellido": self.apellido,
              "email": self.email,
              "password":self.password,
+            #  "personas":self.personas.serialize(),
+            #  "planetas":self.planetas.serialize(),
+            #  "vehiculos":self.vehiculos.serialize(),
+
              # do not serialize the password, its a security breach
          }
     
@@ -73,7 +80,7 @@ class Personas(db.Model):
              "color_de_pelo":self.color_de_pelo,
              "peso":self.peso,
              "altura":self.altura,
-             "personas":self.personas.serialize(),
+             
              # do not serialize the password, its a security breach
          }
 
@@ -108,7 +115,7 @@ class Planetas(db.Model):
              "clima":self.clima,
              "terreno":self.terreno,
              "superficie_liquida ":self.superficie_liquida,
-             "planetas":self.planetas.serialize(),
+             
              # do not serialize the password, its a security breach
          }    
 
@@ -149,7 +156,7 @@ class Vehiculos(db.Model):
             "velocidad_maxima":self.velocidad_maxima,
             "capacidad_carga":self.capacidad_carga,
             "provisiones":self.provisiones,
-            "vehiculos":self.vehiculos.serialize(),
+            
             # do not serialize the password, its a security breach
         }        
 
